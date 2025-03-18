@@ -1,0 +1,4 @@
+.snakemake/*
+results/*
+resources/*
+input/*

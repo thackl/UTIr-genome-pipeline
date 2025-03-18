@@ -1,0 +1,9 @@
+prep_np:
+    min_length: 2000
+flye: ""
+flye_post: "--min-length 2000 --id-pattern '%s_%03d'"
+checkm2_db: "resources/databases/checkm2/CheckM2_database/uniref100.KO.1.dmnd"
+bakta_db: "resources/databases/bakta/db/"
+gtdbtk_db: "resources/databases/gtdbtk/release220/"
+genomad_db: "resources/databases/genomad_db/"
+sylph_db: "resources/databases/sylph/gtdb-r220-c200-dbv1.syldb"
