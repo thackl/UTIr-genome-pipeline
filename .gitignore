@@ -1,4 +1,4 @@
 .snakemake/*
-results/*
-resources/*
-input/*
+analysis/*
+databases/*
+
