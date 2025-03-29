@@ -1,5 +1,5 @@
 tool=genomad
-db=resources/databases
+db=databases
 
 if [ -d "$db" ]; then
     echo "Existing $tool database detect at $db."

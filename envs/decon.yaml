@@ -1,0 +1,6 @@
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - seqkit =2.10.0
+  - csvtk =0.31.0

@@ -1,9 +1,19 @@
-prep_np:
-    min_length: 2000
 flye: ""
 flye_post: "--min-length 2000 --id-pattern '%s_%03d'"
-checkm2_db: "resources/databases/checkm2/CheckM2_database/uniref100.KO.1.dmnd"
-bakta_db: "resources/databases/bakta/db/"
-gtdbtk_db: "resources/databases/gtdbtk/release220/"
-genomad_db: "resources/databases/genomad_db/"
-sylph_db: "resources/databases/sylph/gtdb-r220-c200-dbv1.syldb"
+
+decon:
+  min_contamination: 5
+  min_coverage: 10
+
+sylph_db: "databases/sylph/gtdb-r220-c200-dbv1.syldb"
+
+checkm2_db: "databases/checkm2/CheckM2_database/uniref100.KO.1.dmnd"
+
+seq-circ-restart_db: "databases/seq-circ-restart/dnaN-uniprot.faa"
+
+gtdbtk_db: "databases/gtdbtk/release220/"
+
+bakta_db: "databases/bakta/db/"
+
+genomad_db: "databases/genomad_db/"
+

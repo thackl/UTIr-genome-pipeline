@@ -1,5 +1,5 @@
 tool=bakta
-db=resources/databases/$tool
+db=databases/$tool
 
 if [ -d "$db" ]; then
     echo "Existing $tool database detect at $db."
