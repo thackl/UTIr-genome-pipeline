@@ -3,7 +3,6 @@ configfile: "config/config.yaml"
 import glob
 
 # list/comment-out analyses output (needs to folder for some, file for others)
-
 analyses=[
     "flye",
     "medaka",
@@ -13,7 +12,19 @@ analyses=[
     "checkm2_decon",
     "gtdbtk",
     "genomad",
-    "bakta",
+    "bakta"
+]
+
+summaries=[
+    # "flye",
+    # "medaka",
+    "checkm2",
+    # "decon",
+    "assembly", # after "restart"
+    "checkm2_decon",
+    "gtdbtk",
+    # "genomad",
+    # "bakta"
 ]
 
 #-----------------------------------------------------------------------------#
@@ -33,7 +44,8 @@ FQP, = glob_wildcards("analysis/reads/{z}.fq.gz")
 rule all:
     input:
         expand("analysis/sylph/{z}.tsv", z=FQP),
-        expand("analysis/{a}/{x}", a=analyses, x=glob_ids())
+        expand("analysis/{a}/{x}", a=analyses, x=glob_ids()),
+        expand("summary/{s}_summary.tsv", s=summaries)
 
 # Taxonomic profiling of reads to check for off samples and contaminations
 # run sample by sample so it's easier to recompute for added samples
@@ -92,16 +104,14 @@ rule checkm2:
         "checkm2 predict -t {threads} --force"
         " --database_path {config[checkm2_db]} -i {input} -o {output.dir};"
 
-rule checkm2_collect:
+rule checkm2_summarize:
     conda: "envs/decon.yaml"
     threads: 1
     input: expand("analysis/checkm2/{x}/quality_report.tsv", x=glob_ids())
     output:
-        all="analysis/checkm2/checkm2_all.tsv",
-        bad="analysis/checkm2/checkm2_contaminated.tsv"
+        all="summary/checkm2_summary.tsv",
     shell:    
-        "csvtk -tT concat {input}.tsv > {output.all}; "
-        "csvtk -tT filter -f 'Contamination>5' {output.all} > {output.bad}"
+        "csvtk -tT concat {input} > {output.all}"
 
 # remove low-coverage contaminations from assemblies flagged by checkm2
 rule decon:
@@ -160,6 +170,17 @@ rule restart:
         fi
         """
 
+rule assembly_summary:
+    conda: "envs/decon.yaml"
+    threads: 1
+    input: expand("analysis/restart/{x}/{x}.tsv", x=glob_ids())
+    output:
+        all="summary/assembly_summary.tsv",
+    shell:
+        """
+        csvtk -tT concat {input} > {output.all}
+        """
+        
 rule checkm2_decon:
     conda: "envs/checkm2.yaml"
     threads: 4
@@ -172,17 +193,15 @@ rule checkm2_decon:
         "checkm2 predict -t {threads} --force"
         " --database_path {config[checkm2_db]} -i {input} -o {output.dir};"
 
-rule checkm2_decon_collect:
+rule checkm2_decon_summarize:
     conda: "envs/decon.yaml"
     threads: 1
     input: expand("analysis/checkm2_decon/{x}/quality_report.tsv", x=glob_ids())
     output:
-        all="analysis/checkm2_decon/checkm2_decon_all.tsv",
-        bad="analysis/checkm2_decon/checkm2_decon_contaminated.tsv"
+        all="summary/checkm2_decon_summary.tsv",
     shell:
         """
         csvtk -tT concat {input} > {output.all}
-        csvtk -tT filter -f 'Contamination>5' {output.all} > {output.bad}
         """
 
 # taxonomically classify genomes using GTDB
@@ -199,12 +218,12 @@ rule gtdbtk:
         "gtdbtk classify_wf --cpus {threads} --genome_dir {input.dir}"
         " --out_dir {output.dir} --mash_db {config[gtdbtk_db]}"
 
-rule gtdbtk_collect:
+rule gtdbtk_summarize:
     conda: "envs/decon.yaml"
     threads: 1
     input: expand("analysis/gtdbtk/{x}/gtdbtk.bac120.summary.tsv", x=glob_ids())
     output:
-        all="analysis/gtdbtk/gtdbtk_bac120_all.tsv"
+        all="summary/gtdbtk_summary.tsv"
     shell:    
         "csvtk -tT concat {input} > {output.all}"
 
